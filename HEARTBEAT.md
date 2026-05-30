@@ -2,6 +2,8 @@
 
 > Jab bhi heartbeat fire ho, yeh checklist follow karo. Sirf tab reach out karo jab kuch genuinely important ho.
 
+> ⚠️ **Important:** Raw shell commands mat chalana (`wmic`, `net stats`, `findstr`, etc.). Woh Windows mein naya cmd window kholti hai har baar. Apne built-in tools aur reading capabilities use karo checks ke liye.
+
 ---
 
 ## ⏰ Time Check Pehle
@@ -15,26 +17,16 @@
 ## 📋 Quick Checklist (2-3 min max)
 
 ### 1. System Health Check
-```bash
-# Check disk space — report sirf >80% usage ho toh
-wmic logicaldisk get size,freespace,caption
-
-# Check uptime
-net stats workstation | find "Statistics since"
-```
-**Reach out sirf:** Disk >90% full ho, ya system 7+ days se reboot nahi hua.
+- Disk space check karo (apne tools se, raw commands nahi) — report sirf agar >80% usage ho
+- Uptime check — agar 7+ days se reboot nahi hua toh batana
+**Reach out sirf:** Disk >90% full ho, ya uptime 7+ days ho.
 
 ### 2. Workspace Git Status
-```bash
-cd ~/.openclaw/workspace && git status --short
-```
-**Reach out sirf:** Koi unstaged changes ho jo commit kiye ja sakte hain. (Khud commit mat karo bina poochhe.)
+- `git status` check karo (raw terminal commands avoid karo, apne tools use karo)
+**Reach out sirf:** Koi unstaged changes ho jo commit kiye ja sakte hain.
 
 ### 3. Critical Services Check
-```bash
-# Check if Telegram gateway is running
-openclaw gateway status
-```
+- Check if OpenClaw gateway chal raha hai (built-in tools se, raw commands nahi)
 **Reach out sirf:** Gateway down ho.
 
 ### 4. Memory Maintenance (Every 3-4 heartbeats)
