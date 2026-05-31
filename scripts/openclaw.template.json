@@ -1,0 +1,116 @@
+{
+  "env": {
+    "OPENROUTER_API_KEY": "__FILL_FROM_ENV__",
+    "OPENROUTER_API_KEY_2": "__FILL_FROM_ENV__",
+    "OPENROUTER_API_KEY_3": "__FILL_FROM_ENV__",
+    "GROQ_API_KEY": "__FILL_FROM_ENV__",
+    "GEMINI_API_KEY": "__FILL_FROM_ENV__",
+    "GEMINI_API_KEY_2": "__FILL_FROM_ENV__",
+    "GEMINI_API_KEY_3": "__FILL_FROM_ENV__"
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace",
+      "models": {
+        "google/gemini-2.5-flash": { "alias": "Gemini Flash" },
+        "google/gemini-2.0-flash": { "alias": "Gemini Free" },
+        "openrouter/deepseek/deepseek-v4-flash": { "alias": "Paid Fallback" }
+      },
+      "model": {
+        "primary": "google/gemini-2.5-flash",
+        "fallbacks": ["google/gemini-2.0-flash", "openrouter/deepseek/deepseek-v4-flash"]
+      },
+      "heartbeat": {
+        "every": "30m",
+        "model": "google/gemini-2.0-flash"
+      },
+      "subagents": { "model": "google/gemini-2.0-flash" },
+      "memorySearch": {
+        "provider": "openai-compatible",
+        "enabled": true,
+        "model": "text-embedding-004",
+        "remote": {
+          "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai/",
+          "apiKey": "${GEMINI_API_KEY}"
+        }
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "__RUN_openclaw_doctor_--generate-gateway-token__"
+    },
+    "port": 18789,
+    "bind": "loopback",
+    "tailscale": { "mode": "off", "resetOnExit": false },
+    "controlUi": { "allowInsecureAuth": false },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap", "camera.clip", "screen.record",
+        "contacts.add", "calendar.add", "reminders.add",
+        "sms.send", "sms.search"
+      ]
+    }
+  },
+  "session": { "dmScope": "per-channel-peer" },
+  "tools": { "profile": "coding" },
+  "plugins": {
+    "entries": {
+      "openrouter": { "enabled": true },
+      "telegram": { "enabled": true },
+      "discord": { "enabled": true },
+      "google": { "enabled": true }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "openrouter:default": { "provider": "openrouter", "mode": "api_key" },
+      "openrouter:backup1": { "provider": "openrouter", "mode": "api_key" },
+      "openrouter:backup2": { "provider": "openrouter", "mode": "api_key" },
+      "groq:default": { "provider": "openrouter", "mode": "api_key" },
+      "google:default": { "provider": "google", "mode": "api_key" },
+      "google:backup1": { "provider": "google", "mode": "api_key" },
+      "google:backup2": { "provider": "google", "mode": "api_key" }
+    },
+    "order": {
+      "openrouter": ["openrouter:default", "openrouter:backup1", "openrouter:backup2"],
+      "google": ["google:default", "google:backup1", "google:backup2"]
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "groups": { "*": { "requireMention": true } },
+      "botToken": "__FILL_FROM_ENV__"
+    },
+    "discord": {
+      "enabled": true,
+      "token": "__FILL_FROM_ENV__",
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "guilds": {
+        "1075650565729693706": {
+          "requireMention": true,
+          "users": ["490449159808221187"]
+        }
+      }
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "session-memory": { "enabled": true },
+        "compaction-notifier": { "enabled": true },
+        "command-logger": { "enabled": true },
+        "bootstrap-extra-files": { "enabled": true },
+        "boot-md": { "enabled": true }
+      }
+    }
+  },
+  "commands": {
+    "ownerAllowFrom": ["telegram:615060722", "discord:490449159808221187"]
+  }
+}
