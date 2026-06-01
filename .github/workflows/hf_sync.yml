@@ -1,8 +1,7 @@
 name: Sync to Hugging Face Hub
-
 on:
   push:
-    branches: [main, master] # Works for both names
+    branches: [master] # Changed from main to master
   workflow_dispatch:
 
 jobs:
@@ -13,10 +12,8 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-          
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Use HEAD to push whatever branch is currently active
           git push -f https://Botcloud:$HF_TOKEN@huggingface.co/spaces/Botcloud/my-claw-agent HEAD:main
