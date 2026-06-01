@@ -1,115 +1,83 @@
-# Claw - OpenClaw Workspace
+***
 
-This workspace contains Claw's identity, memory, instructions, and setup scripts.
-Secrets do not belong in this repo.
+# 🧠 Claw Workspace: Your Personal AI "Digital Brain"
+> **The 100% Free, Private, and Self-Syncing AI Agent Template.**
 
-## Structure
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Cost: $0](https://img.shields.io/badge/Monthly%20Cost-%240.00-brightgreen)](#-forever-free-stack)
+[![Engine: Gemini 1.5 Flash](https://img.shields.io/badge/Engine-Gemini%20Flash-blue)](https://aistudio.google.com/)
 
-```text
-.
-|-- SOUL.md
-|-- IDENTITY.md
-|-- USER.md
-|-- AGENTS.md
-|-- TOOLS.md
-|-- HEARTBEAT.md
-|-- MEMORY.md
-|-- memory/
-|-- scripts/
-`-- README.md
-```
+**Claw** is an autonomous agent workspace that lives inside your GitHub repository. Unlike typical AI bots, Claw has a **long-term memory**, a **defined personality**, and **zero monthly subscription fees**. It uses GitHub as its hard drive and Gemini as its brain.
 
-## Deploying On A New Server
+---
 
-Prerequisites:
+## ⚡ The "One-Click" Promise
+This template is designed so you can deploy your own AI agent in under 5 minutes. **No credit card, no complex server management, no hidden fees.**
 
-- OpenClaw installed: `curl -fsSL https://openclaw.ai/install.sh | bash`
-- Node.js available through OpenClaw
-- A freshly rotated `~/.openclaw/.env`
+1.  **Fork** this repo.
+2.  **Add** your Gemini API Key to GitHub Secrets.
+3.  **Enable** Actions.
+**Your agent is now alive.**
 
-Clone or copy the workspace:
+---
 
-```bash
-git clone https://github.com/Badal3850/claw-workspace.git ~/.openclaw/workspace
-```
+## 🛠 The "Forever Free" Stack
+This workspace leverages the most generous free tiers in tech to ensure you never get a bill:
 
-Restore secrets, then sync config and runtime auth:
+*   **Brain:** [Google Gemini 1.5 Flash](https://aistudio.google.com/) (15 RPM free – more than enough for a personal agent).
+*   **Memory:** GitHub Markdown files (Infinite storage, version-controlled).
+*   **Compute:** [GitHub Actions](https://github.com/features/actions) (2,000 mins/month free) or [Hugging Face Spaces](https://huggingface.co/spaces) (24/7 free CPU).
+
+---
+
+## 📂 Anatomy of an Agent
+This repository is organized to give your agent a human-like cognitive structure:
 
 ```bash
-cp /path/to/backup/.env ~/.openclaw/.env
-node ~/.openclaw/workspace/scripts/fill-config.js
+├── 🧠 SOUL.md          # Core personality, ethics, and communication style.
+├── 🆔 IDENTITY.md      # Name, handle, and specific character traits.
+├── 👤 USER.md          # Your profile—Claw’s knowledge about YOU.
+├── 📖 MEMORY.md        # The Index. How Claw navigates its own past.
+├── 📁 memory/          # The "Neural Folders"—raw facts, logs, and learned data.
+├── 🤖 AGENTS.md        # Delegation logic for sub-agents.
+└── 💓 HEARTBEAT.md     # The logs of Claw's autonomous thoughts.
 ```
 
-The sync script keeps provider and bot secrets out of `openclaw.json`. Provider
-API keys are written to OpenClaw's runtime auth store at
-`~/.openclaw/agents/main/agent/auth-profiles.json`. Telegram reads
-`TELEGRAM_BOT_TOKEN` from the service environment.
+---
 
-Generate or refresh the gateway token:
+## 🚀 Setup Instructions
 
-```bash
-openclaw doctor --generate-gateway-token
-```
+### Step 1: Prepare the Brain
+Get a free API key from **[Google AI Studio](https://aistudio.google.com/)**.
 
-Start the gateway:
+### Step 2: Configure GitHub
+1. **Fork** this repository to your account.
+2. Go to **Settings > Secrets and Variables > Actions**.
+3. Create a **New Repository Secret** named `GEMINI_API_KEY` and paste your key.
+4. Create a **Personal Access Token (PAT)** with `repo` permissions and save it as `CLAW_PAT`. (This allows Claw to write to its own memory).
 
-```bash
-openclaw gateway start
-```
+### Step 3: Wake Up Claw
+Go to the **Actions** tab in your repo and click **"Enable Workflows"**. Claw will now run on a schedule, processing your tasks and updating its memory automatically.
 
-Full remote bootstrap:
+---
 
-```bash
-bash ~/.openclaw/workspace/scripts/bootstrap.sh <user> <host>
-```
+## 🌈 Use Cases
+*   **The Second Brain:** Feed Claw articles, notes, and goals; let it organize them into a knowledge graph in your `memory/` folder.
+*   **Autonomous Coding:** Give Claw a project goal in `USER.md`, and it will outline the architecture and write code snippets while you sleep.
+*   **Personal Assistant:** Configure Claw to monitor your tasks and remind you of deadlines via GitHub Issues.
 
-## Secrets Management
+---
 
-Keep these variables in `~/.openclaw/.env`:
+## 🔒 Privacy & Ownership
+Most AI agents store your data on their servers. **Claw stores everything in YOUR GitHub repo.**
+*   You own the memories.
+*   You see every "thought" in the commit history.
+*   If you delete the repo, the data is gone. **You are in total control.**
 
-| Variable | Purpose |
-| --- | --- |
-| `OPENROUTER_API_KEY` | OpenRouter model access |
-| `GROQ_API_KEY` | Groq model access |
-| `GEMINI_API_KEY` | Gemini chat and memory embeddings |
-| `TELEGRAM_BOT_TOKEN` | Telegram BotFather token |
-| `DISCORD_BOT_TOKEN` | Optional; Discord is disabled by default |
+---
 
-Important:
+### 🤝 Credits
+Built on the **[OpenClaw](https://github.com/OpenClaw)** framework.  
+*Template maintained by [@Badal3850](https://github.com/Badal3850)*
 
-- Rotate every exposed value in the provider consoles before treating the setup as secure.
-- Do not store backup provider accounts for quota evasion.
-- Do not commit `.env`, `openclaw.json`, backups, or runtime auth files.
-- Use `workspace/scripts/repair-secrets.js` after replacing keys in `.env` to resync auth without printing secrets.
-
-## Agent Defaults
-
-- Primary model: Gemini 2.5 Flash
-- Fallbacks: Gemini 2.0 Flash, OpenRouter DeepSeek V4 Flash
-- Groq: configured as a direct provider, but not in the default fallback chain because the current free-tier TPM limit rejects OpenClaw's smallest request envelope
-- Heartbeat: every 30 minutes using Gemini 2.0 Flash
-- Sub-agents: Gemini 2.0 Flash
-- Memory search: Gemini `gemini-embedding-001`
-- Channels: Telegram enabled; Discord retained but disabled
-
-## Validation
-
-```bash
-openclaw config validate
-openclaw models status
-openclaw channels status
-openclaw memory status
-```
-
-## Updating
-
-```bash
-cd ~/.openclaw/workspace
-git add -A
-git commit -m "Update workspace state"
-git push
-```
-
-## License
-
-Private personal agent workspace.
+***

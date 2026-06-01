@@ -1,0 +1,24 @@
+name: Claw Autopilot
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CLAW_PAT }} # Personal Access Token to allow pushing
+      - name: Run Agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          npm install
+          npm start
+          git config --global user.name "Claw-Agent"
+          git config --global user.email "claw@agent.ai"
+          git add .
+          git commit -m "Scheduled Autopilot Update" || exit 0
+          git push

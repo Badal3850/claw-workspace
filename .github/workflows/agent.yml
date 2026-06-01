@@ -1,0 +1,27 @@
+name: Claw Autonomous Cycle
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch: # Allows you to start it manually
+
+jobs:
+  run-claw:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Workspace
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CLAW_PAT }} # Uses the user's secret token
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Claw
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLAW_PAT: ${{ secrets.CLAW_PAT }}
+        run: |
+          chmod +x scripts/run.sh
+          ./scripts/run.sh
