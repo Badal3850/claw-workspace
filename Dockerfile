@@ -1,22 +1,25 @@
-# We change 20-slim to 22-slim to meet the engine requirement
+# Use Node 22 (Required by OpenClaw)
 FROM node:22-slim
 
 # Install Git
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Hugging Face runs as user 1000
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
+# Use the 'node' user that already exists in this image (UID 1000)
+USER node
+ENV HOME=/home/node \
+    PATH=/home/node/.local/bin:$PATH
 
+# Set the working directory inside the node user's home
 WORKDIR $HOME/app
 
-# Copy files and set ownership
-COPY --chown=user . .
+# Copy your files and make sure the 'node' user owns them
+COPY --chown=node:node . .
 
-# Now this command will work without warnings
+# Install OpenClaw
 RUN npm install
 
+# Hugging Face port
 EXPOSE 7860
+
+# Start the agent
 CMD ["bash", "scripts/run.sh"]
