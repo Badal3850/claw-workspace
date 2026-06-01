@@ -1,24 +1,19 @@
 {
-  "env": {
-    "OPENROUTER_API_KEY": "__FILL_FROM_ENV__",
-    "OPENROUTER_API_KEY_2": "__FILL_FROM_ENV__",
-    "OPENROUTER_API_KEY_3": "__FILL_FROM_ENV__",
-    "GROQ_API_KEY": "__FILL_FROM_ENV__",
-    "GEMINI_API_KEY": "__FILL_FROM_ENV__",
-    "GEMINI_API_KEY_2": "__FILL_FROM_ENV__",
-    "GEMINI_API_KEY_3": "__FILL_FROM_ENV__"
-  },
   "agents": {
     "defaults": {
       "workspace": "~/.openclaw/workspace",
       "models": {
         "google/gemini-2.5-flash": { "alias": "Gemini Flash" },
         "google/gemini-2.0-flash": { "alias": "Gemini Free" },
-        "openrouter/deepseek/deepseek-v4-flash": { "alias": "Paid Fallback" }
+        "openrouter/deepseek/deepseek-v4-flash": { "alias": "OpenRouter Fallback" },
+        "groq/openai/gpt-oss-20b": { "alias": "Groq Fast" }
       },
       "model": {
         "primary": "google/gemini-2.5-flash",
-        "fallbacks": ["google/gemini-2.0-flash", "openrouter/deepseek/deepseek-v4-flash"]
+        "fallbacks": [
+          "google/gemini-2.0-flash",
+          "openrouter/deepseek/deepseek-v4-flash"
+        ]
       },
       "heartbeat": {
         "every": "30m",
@@ -26,13 +21,9 @@
       },
       "subagents": { "model": "google/gemini-2.0-flash" },
       "memorySearch": {
-        "provider": "openai-compatible",
+        "provider": "gemini",
         "enabled": true,
-        "model": "text-embedding-004",
-        "remote": {
-          "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai/",
-          "apiKey": "${GEMINI_API_KEY}"
-        }
+        "model": "gemini-embedding-001"
       }
     }
   },
@@ -54,40 +45,59 @@
       ]
     }
   },
+  "models": {
+    "providers": {
+      "google": {
+        "api": "google-generative-ai",
+        "models": [
+          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
+          { "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" }
+        ]
+      },
+      "groq": {
+        "api": "openai-completions",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "models": [
+          { "id": "openai/gpt-oss-20b", "name": "Groq GPT OSS 20B" }
+        ]
+      },
+      "openrouter": {
+        "models": [
+          { "id": "deepseek/deepseek-v4-flash", "name": "DeepSeek V4 Flash" }
+        ]
+      }
+    }
+  },
   "session": { "dmScope": "per-channel-peer" },
   "tools": { "profile": "coding" },
   "plugins": {
     "entries": {
       "openrouter": { "enabled": true },
       "telegram": { "enabled": true },
-      "discord": { "enabled": true },
-      "google": { "enabled": true }
+      "discord": { "enabled": false },
+      "google": { "enabled": true },
+      "groq": { "enabled": true }
     }
   },
   "auth": {
     "profiles": {
       "openrouter:default": { "provider": "openrouter", "mode": "api_key" },
-      "openrouter:backup1": { "provider": "openrouter", "mode": "api_key" },
-      "openrouter:backup2": { "provider": "openrouter", "mode": "api_key" },
-      "groq:default": { "provider": "openrouter", "mode": "api_key" },
-      "google:default": { "provider": "google", "mode": "api_key" },
-      "google:backup1": { "provider": "google", "mode": "api_key" },
-      "google:backup2": { "provider": "google", "mode": "api_key" }
+      "groq:default": { "provider": "groq", "mode": "api_key" },
+      "google:default": { "provider": "google", "mode": "api_key" }
     },
     "order": {
-      "openrouter": ["openrouter:default", "openrouter:backup1", "openrouter:backup2"],
-      "google": ["google:default", "google:backup1", "google:backup2"]
+      "openrouter": ["openrouter:default"],
+      "groq": ["groq:default"],
+      "google": ["google:default"]
     }
   },
   "channels": {
     "telegram": {
       "enabled": true,
-      "groups": { "*": { "requireMention": true } },
-      "botToken": "__FILL_FROM_ENV__"
+      "groups": { "*": { "requireMention": true } }
     },
     "discord": {
-      "enabled": true,
-      "token": "__FILL_FROM_ENV__",
+      "enabled": false,
       "dmPolicy": "pairing",
       "groupPolicy": "allowlist",
       "guilds": {
@@ -111,6 +121,6 @@
     }
   },
   "commands": {
-    "ownerAllowFrom": ["telegram:615060722", "discord:490449159808221187"]
+    "ownerAllowFrom": ["telegram:615060722"]
   }
 }
