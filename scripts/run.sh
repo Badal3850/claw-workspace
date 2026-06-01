@@ -1,41 +1,40 @@
 #!/bin/bash
+# Start the long-running OpenClaw gateway for container/Hugging Face deployments.
+# This script initializes the active OpenClaw config and does not commit files.
 
-# 1. Complete Git Clean-up (Fixes the "Credential Storage Lock" error)
-git config --global --unset-all credential.helper
-git config --global user.name "Claw-Agent"
-git config --global user.email "claw@agent.ai"
+set -euo pipefail
 
-# Set the remote with your Token for full access
-git remote set-url origin https://Badal3850:$CLAW_PAT@github.com/Badal3850/claw-workspace.git
+CLAW_BRANCH="${CLAW_BRANCH:-master}"
+PORT="${PORT:-7860}"
+OPENCLAW_HOME="${OPENCLAW_HOME:-$HOME/.openclaw}"
+OPENCLAW_CONFIG_PATH="${OPENCLAW_CONFIG_PATH:-$OPENCLAW_HOME/openclaw.json}"
+OPENCLAW_ENV_PATH="${OPENCLAW_ENV_PATH:-$OPENCLAW_HOME/.env}"
+OPENCLAW_GATEWAY_BIND="${OPENCLAW_GATEWAY_BIND:-lan}"
+export PORT OPENCLAW_HOME OPENCLAW_CONFIG_PATH OPENCLAW_ENV_PATH OPENCLAW_GATEWAY_BIND
 
-# 2. Pull latest changes
-git pull origin master
-
-# 3. Generate the OpenClaw config
-# We ensure the port is set inside the config just in case
-cat <<EOF > openclaw.json
-{
-  "name": "${CLAW_NAME:-Claw}",
-  "model": "gemini-1.5-flash",
-  "api_key": "${GEMINI_API_KEY}",
-  "workspace_path": "./",
-  "server": {
-    "port": 7860
-  }
+setup_git_identity() {
+  git config --global user.name "${GIT_AUTHOR_NAME:-Claw-Agent}"
+  git config --global user.email "${GIT_AUTHOR_EMAIL:-claw@agent.ai}"
 }
-EOF
 
-# 4. Start the OpenClaw Agent
-# FIXED: Changed 'run' to 'start' as requested by the OpenClaw CLI
-# We use PORT=7860 as an environment variable to force it for Hugging Face
-export PORT=7860
-npx openclaw start &
+safe_pull() {
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return 0
+  fi
 
-# 5. The Sync Loop
-while true; do
-  sleep 600
-  git add .
-  git commit -m "Claw Memory Sync: $(date)"
-  git push origin master
-  echo "Memories backed up to GitHub."
-done
+  if git remote get-url origin >/dev/null 2>&1; then
+    git fetch origin "$CLAW_BRANCH" || true
+    git pull --ff-only origin "$CLAW_BRANCH" || true
+  fi
+}
+
+init_openclaw() {
+  node scripts/init-openclaw-config.js "$OPENCLAW_ENV_PATH" "$OPENCLAW_CONFIG_PATH"
+  npx openclaw config validate
+}
+
+setup_git_identity
+safe_pull
+init_openclaw
+
+exec npx openclaw gateway run --port "$PORT" --bind "$OPENCLAW_GATEWAY_BIND" --allow-unconfigured

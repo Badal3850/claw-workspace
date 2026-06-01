@@ -16,7 +16,7 @@ WORKDIR $HOME/app
 COPY --chown=node:node . .
 
 # Install OpenClaw
-RUN npm install
+RUN npm ci
 
 # Hugging Face port
 EXPOSE 7860

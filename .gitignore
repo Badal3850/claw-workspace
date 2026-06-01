@@ -13,3 +13,15 @@ Thumbs.db
 *.bak
 *.swp
 *.tmp
+
+# Dependencies
+node_modules/
+
+# Generated runtime config (may contain local deployment details)
+openclaw.json
+
+# Package-manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

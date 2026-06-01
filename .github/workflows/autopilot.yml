@@ -1,24 +1,44 @@
 name: Claw Autopilot
 on:
-  schedule:
-    - cron: '0 * * * *' # Runs every hour
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch:
+
+concurrency:
+  group: claw-autopilot-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run-agent:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.CLAW_PAT }} # Personal Access Token to allow pushing
-      - name: Run Agent
+          token: ${{ secrets.CLAW_PAT || github.token }}
+          ref: master
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run manual Claw cycle
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          npm install
-          npm start
-          git config --global user.name "Claw-Agent"
-          git config --global user.email "claw@agent.ai"
-          git add .
-          git commit -m "Scheduled Autopilot Update" || exit 0
-          git push
+          GEMINI_API_KEY_FREE_1: ${{ secrets.GEMINI_API_KEY_FREE_1 }}
+          GEMINI_API_KEY_FREE_2: ${{ secrets.GEMINI_API_KEY_FREE_2 }}
+          GEMINI_API_KEY_FREE_3: ${{ secrets.GEMINI_API_KEY_FREE_3 }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_API_KEY_FREE_1: ${{ secrets.OPENROUTER_API_KEY_FREE_1 }}
+          OPENROUTER_API_KEY_FREE_2: ${{ secrets.OPENROUTER_API_KEY_FREE_2 }}
+          OPENROUTER_API_KEY_FREE_3: ${{ secrets.OPENROUTER_API_KEY_FREE_3 }}
+          GEMINI_API_KEY_PAID: ${{ secrets.GEMINI_API_KEY_PAID }}
+          OPENROUTER_API_KEY_PAID: ${{ secrets.OPENROUTER_API_KEY_PAID }}
+          CLAW_ENABLE_PAID_FALLBACK: ${{ vars.CLAW_ENABLE_PAID_FALLBACK }}
+          CLAW_PAT: ${{ secrets.CLAW_PAT }}
+          CLAW_BRANCH: master
+        run: ./scripts/agent-cycle.sh
