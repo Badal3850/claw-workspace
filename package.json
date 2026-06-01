@@ -1,0 +1,15 @@
+{
+  "name": "claw-workspace",
+  "version": "1.0.0",
+  "description": "Forever Free OpenClaw Agent Template",
+  "main": "index.js",
+  "dependencies": {
+    "openclaw": "latest"
+  },
+  "scripts": {
+    "start": "bash scripts/run.sh"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
