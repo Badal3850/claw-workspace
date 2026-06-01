@@ -1,3 +1,11 @@
+---
+title: My Claw Agent
+emoji: 🤖
+colorFrom: indigo
+colorTo: pink
+sdk: docker
+pinned: false
+---
 ***
 
 # 🧠 Claw Workspace: Your Personal AI "Digital Brain"
