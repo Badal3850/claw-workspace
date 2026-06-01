@@ -4,12 +4,14 @@
   "description": "Forever Free OpenClaw Agent Template",
   "main": "index.js",
   "dependencies": {
-    "openclaw": "latest"
+    "openclaw": "2026.5.28"
   },
   "scripts": {
-    "start": "bash scripts/run.sh"
+    "start": "bash scripts/run.sh",
+    "agent:cycle": "bash scripts/agent-cycle.sh",
+    "init:config": "node scripts/init-openclaw-config.js"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.19.0"
   }
 }

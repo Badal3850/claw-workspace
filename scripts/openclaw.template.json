@@ -3,23 +3,34 @@
     "defaults": {
       "workspace": "~/.openclaw/workspace",
       "models": {
-        "google/gemini-2.5-flash": { "alias": "Gemini Flash" },
-        "google/gemini-2.0-flash": { "alias": "Gemini Free" },
-        "openrouter/deepseek/deepseek-v4-flash": { "alias": "OpenRouter Fallback" },
-        "groq/openai/gpt-oss-20b": { "alias": "Groq Fast" }
+        "google/gemini-2.5-flash-lite": {
+          "alias": "Gemini Flash-Lite Free"
+        },
+        "google/gemini-2.5-flash": {
+          "alias": "Gemini Flash Free"
+        },
+        "openrouter/openrouter/free": {
+          "alias": "OpenRouter Free Router"
+        },
+        "openrouter/deepseek/deepseek-v4-flash:free": {
+          "alias": "DeepSeek V4 Free"
+        }
       },
       "model": {
-        "primary": "google/gemini-2.5-flash",
+        "primary": "google/gemini-2.5-flash-lite",
         "fallbacks": [
-          "google/gemini-2.0-flash",
-          "openrouter/deepseek/deepseek-v4-flash"
+          "google/gemini-2.5-flash",
+          "openrouter/openrouter/free",
+          "openrouter/deepseek/deepseek-v4-flash:free"
         ]
       },
       "heartbeat": {
         "every": "30m",
-        "model": "google/gemini-2.0-flash"
+        "model": "google/gemini-2.5-flash"
       },
-      "subagents": { "model": "google/gemini-2.0-flash" },
+      "subagents": {
+        "model": "google/gemini-2.5-flash"
+      },
       "memorySearch": {
         "provider": "gemini",
         "enabled": true,
@@ -33,15 +44,25 @@
       "mode": "token",
       "token": "__RUN_openclaw_doctor_--generate-gateway-token__"
     },
-    "port": 18789,
-    "bind": "loopback",
-    "tailscale": { "mode": "off", "resetOnExit": false },
-    "controlUi": { "allowInsecureAuth": false },
+    "port": 7860,
+    "bind": "lan",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "controlUi": {
+      "allowInsecureAuth": false
+    },
     "nodes": {
       "denyCommands": [
-        "camera.snap", "camera.clip", "screen.record",
-        "contacts.add", "calendar.add", "reminders.add",
-        "sms.send", "sms.search"
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send",
+        "sms.search"
       ]
     }
   },
@@ -50,77 +71,82 @@
       "google": {
         "api": "google-generative-ai",
         "models": [
-          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
-          { "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" }
-        ]
-      },
-      "groq": {
-        "api": "openai-completions",
-        "baseUrl": "https://api.groq.com/openai/v1",
-        "models": [
-          { "id": "openai/gpt-oss-20b", "name": "Groq GPT OSS 20B" }
+          {
+            "id": "gemini-2.5-flash-lite",
+            "name": "Gemini 2.5 Flash-Lite"
+          },
+          {
+            "id": "gemini-2.5-flash",
+            "name": "Gemini 2.5 Flash"
+          }
         ]
       },
       "openrouter": {
         "models": [
-          { "id": "deepseek/deepseek-v4-flash", "name": "DeepSeek V4 Flash" }
+          {
+            "id": "openrouter/free",
+            "name": "OpenRouter Free Router"
+          },
+          {
+            "id": "deepseek/deepseek-v4-flash:free",
+            "name": "DeepSeek V4 Flash Free"
+          }
         ]
       }
     }
   },
-  "session": { "dmScope": "per-channel-peer" },
-  "tools": { "profile": "coding" },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "tools": {
+    "profile": "coding"
+  },
   "plugins": {
     "entries": {
-      "openrouter": { "enabled": true },
-      "telegram": { "enabled": true },
-      "discord": { "enabled": false },
-      "google": { "enabled": true },
-      "groq": { "enabled": true }
+      "openrouter": {
+        "enabled": true
+      },
+      "telegram": {
+        "enabled": true
+      },
+      "google": {
+        "enabled": true
+      }
     }
   },
   "auth": {
     "profiles": {
-      "openrouter:default": { "provider": "openrouter", "mode": "api_key" },
-      "groq:default": { "provider": "groq", "mode": "api_key" },
-      "google:default": { "provider": "google", "mode": "api_key" }
+      "google:free1": {
+        "provider": "google",
+        "mode": "api_key"
+      },
+      "openrouter:free1": {
+        "provider": "openrouter",
+        "mode": "api_key"
+      }
     },
     "order": {
-      "openrouter": ["openrouter:default"],
-      "groq": ["groq:default"],
-      "google": ["google:default"]
+      "google": [
+        "google:free1"
+      ],
+      "openrouter": [
+        "openrouter:free1"
+      ]
     }
   },
   "channels": {
     "telegram": {
       "enabled": true,
-      "groups": { "*": { "requireMention": true } }
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      }
     },
     "discord": {
       "enabled": false,
       "dmPolicy": "pairing",
-      "groupPolicy": "allowlist",
-      "guilds": {
-        "1075650565729693706": {
-          "requireMention": true,
-          "users": ["490449159808221187"]
-        }
-      }
+      "groupPolicy": "allowlist"
     }
-  },
-  "hooks": {
-    "internal": {
-      "enabled": true,
-      "entries": {
-        "session-memory": { "enabled": true },
-        "compaction-notifier": { "enabled": true },
-        "command-logger": { "enabled": true },
-        "bootstrap-extra-files": { "enabled": true },
-        "boot-md": { "enabled": true }
-      }
-    }
-  },
-  "commands": {
-    "ownerAllowFrom": ["telegram:615060722"]
   }
 }
